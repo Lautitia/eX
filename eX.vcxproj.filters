@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="impl">
+      <UniqueIdentifier>{32f8ed51-670c-4600-b084-e703a7240d62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pch">
+      <UniqueIdentifier>{3e85eaf9-006e-4a83-abd7-5a52a6865516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interf">
+      <UniqueIdentifier>{7573e077-59ab-4631-966d-c8e9f5630155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\win32">
+      <UniqueIdentifier>{960058ab-544a-4167-8d37-512f919c1897}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="eX.h" />
+    <ClInclude Include="pch\pch.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="interf\types.h">
+      <Filter>interf</Filter>
+    </ClInclude>
+    <ClInclude Include="interf\i_eX.h">
+      <Filter>interf</Filter>
+    </ClInclude>
+    <ClInclude Include="interf\i_util.h">
+      <Filter>interf</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="impl\win32\string.cpp">
+      <Filter>impl\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
