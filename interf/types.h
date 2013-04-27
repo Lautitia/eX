@@ -86,39 +86,69 @@ enum class Charset{
 	UTF32 = 0x41	//00040001
 };
 
+//CharsetOperation
+template<Charset set, typename MethodT>
+struct CharsetOperation
+{
+	typedef typename MethodT::Type Type;
+	typedef std::tuple<const Type*, UINT32> SubTuple;
 
-//Base Type by different Charset
-template<Charset set>
-struct CharsetType;
-template<>
-struct CharsetType<Charset::GBK>
-{
-	typedef nChar Type;
-};
-typedef CharsetType<Charset::GBK> CharsetTypeGBK;
-template<>
-struct CharsetType<Charset::UTF8>
-{
-	typedef nChar Type;
-};
-typedef CharsetType<Charset::UTF8> CharsetTypeUTF8;
-template<>
-struct CharsetType<Charset::UTF16>
-{
-	typedef wChar Type;
-};
-typedef CharsetType<Charset::UTF16> CharsetTypeUTF16;
+	static UINT32 length(const Type* pos)
+	{
+		if (pos == nullptr){
+			return 0;
+		}
+		UINT32 size = 0;
+		while(MethodT::move(&pos)){
+			++size;
+		}
+		return size;
+	}
+	static SubTuple substr(const Type* str, bool isForward, UINT32 pos, UINT32 len)
+	{
+		//
+		if (str == nullptr){
+			return SubTuple(nullptr, 0);
+		}
 
-//////////////////////////////////////////////////////////////////////////
-//Charset Length
-template<Charset set>
-struct CharsetMove;
+		const UINT32 strLen = length(str);
+		if (!isForward){
+			//get substr from the right(default is from left)
+			const INT32 offsetPos = strLen - pos - len;
+			if (offsetPos<0){
+				//if pos+len > strLen pos is negetive
+				//but it just happend in isForward=false
+				len = strLen - pos;
+				pos = 0;
+			}else{
+				pos = offsetPos;
+			}
+		}
+
+		UINT32 size = 0;
+		const Type* strPos = pos ? nullptr : str;
+		while (*str && len){
+			const UINT32 moved = MethodT::move(&str);
+			size += moved;
+
+			if (pos){
+				--pos;
+				size = 0;
+				strPos = str;
+			}
+			else{
+				len--;
+			}
+		}
+		return SubTuple(strPos, size);
+	}
+};
+
 //GBK
-template<>
-struct CharsetMove<Charset::GBK>
+struct GBKMethod
 {
-	typedef CharsetType<Charset::GBK>::Type T;
-	static UINT32 move(const T** pos)
+	typedef nChar Type;
+	static UINT32 move(const Type** pos)
 	{
 		//
 		if (pos && **pos == '\0'){
@@ -136,12 +166,11 @@ struct CharsetMove<Charset::GBK>
 		return size;
 	}
 };
-typedef CharsetMove<Charset::GBK> CharsetGBKMove;
+
 //UTF8
-template<>
-struct CharsetMove<Charset::UTF8>
+struct UTF8Method
 {
-	typedef CharsetType<Charset::UTF8>::Type T;
+	typedef nChar Type;
 	static int utf8bytes(char c)
 	{
 		//
@@ -156,7 +185,7 @@ struct CharsetMove<Charset::UTF8>
 		}
 		return size;
 	}
-	static UINT32 move(const T** pos)
+	static UINT32 move(const Type** pos)
 	{
 		//
 		if (pos && **pos == '\0'){
@@ -165,15 +194,14 @@ struct CharsetMove<Charset::UTF8>
 		UINT32 bytes = utf8bytes(**pos);
 		(*pos) += bytes;
 		return bytes;
-	}
+	} 
 };
-typedef CharsetMove<Charset::UTF8> CharsetUTF8Move;
+
 //UTF16
-template<>
-struct CharsetMove<Charset::UTF16>
+struct UTF16Method
 {
-	typedef CharsetType<Charset::UTF16>::Type T;
-	static UINT32 move(const T** pos)
+	typedef wChar Type;
+	static UINT32 move(const Type** pos)
 	{
 		//
 		if (pos && **pos == '\0'){
@@ -183,85 +211,14 @@ struct CharsetMove<Charset::UTF16>
 		return 1;
 	}
 };
-typedef CharsetMove<Charset::UTF16> CharsetUTF16Move;
-//Calculate CharsetLength
-template<Charset set>
-struct CharsetLength
-{
-	typedef typename CharsetType<set>::Type T;
-	static unsigned int length(const T* pos)
-	{
-		if (pos == nullptr){
-			return 0;
-		}
-		UINT32 size = 0;
-		while(CharsetMove<set>::move(&pos)){
-			++size;
-		}
-		return size;
-	}
-};
-typedef CharsetLength<Charset::GBK> GBKLength;
-typedef CharsetLength<Charset::UTF8> UTF8Length;
-typedef CharsetLength<Charset::UTF16> UTF16Length;
 
-//////////////////////////////////////////////////////////////////////////
-/*
-	Charset SubString
+typedef CharsetOperation<Charset::GBK, GBKMethod> GBK;
+typedef CharsetOperation<Charset::UTF8, UTF8Method> UTF8;
+typedef CharsetOperation<Charset::UTF16, UTF16Method> UTF16;
 
-*/
-template<Charset set>
-struct CharsetSubStr
-{
-	typedef typename CharsetType<set>::Type T;
-	typedef std::tuple<const T*, UINT32> SubTuple;
-	static SubTuple substr(const T* str, bool isForward, UINT32 pos, UINT32 len)
-	{
-		//
-		if (str == nullptr){
-			return SubTuple(nullptr, 0);
-		}
-
-		const UINT32 strLen = CharsetLength<set>::length(str);
-		if (!isForward){
-			//get substr from the right(default is from left)
-			const INT32 offsetPos = strLen - pos - len;
-			if (offsetPos<0){
-				//if pos+len > strLen pos is negetive
-				//but it just happend in isForward=false
-				len = strLen - pos;
-				pos = 0;
-			}else{
-				pos = offsetPos;
-			}
-		}
-
-		UINT32 size = 0;
-		const T* strPos = pos ? nullptr : str;
-		while (*str && len){
-			const UINT32 moved = CharsetMove<set>::move(&str);
-			size += moved;
-
-			if (pos){
-				--pos;
-				size = 0;
-				strPos = str;
-			}
-			else{
-				len--;
-			}
-		}
-		return SubTuple(strPos, size);
-	}
-};
-typedef CharsetSubStr<Charset::GBK> GBKSubStr;
-typedef CharsetSubStr<Charset::UTF8> UTF8SubStr;
-typedef CharsetSubStr<Charset::UTF16> UTF16SubStr;
-
-//////////////////////////////////////////////////////////////////////////
-//Charset MatchEncode
-template<Charset from, Charset to>
-struct CharsetMatchEncode;
+//CharsetConvert
+template<typename from>
+struct CharsetConvert;
 
 //////////////////////////////////////////////////////////////////////////
 bool IsWideCharset(Charset charSet)
