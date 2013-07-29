@@ -140,18 +140,18 @@ namespace ex{
 // 		return wString.c_str();
 // 	}
 // 	//////////////////////////////////////////////////////////////////////////
-// 	String&& String::left(UINT32 len) const
-// 	{
-// 		return substr(true, 0, len);
-// 	}
-// 	String&& String::right(UINT32 len) const
-// 	{
-// 		return substr(false, 0, len);
-// 	}
-// 	String&& String::mid(UINT32 start, UINT32 len/* = MAX_UINT32*/) const
-// 	{
-// 		return substr(true, start, len);
-// 	}
+ 	String&& String::left(UINT32 len) const
+ 	{
+ 		return substr(true, 0, len);
+ 	}
+ 	String&& String::right(UINT32 len) const
+ 	{
+ 		return substr(false, 0, len);
+ 	}
+ 	String&& String::mid(UINT32 start, UINT32 len/* = MAX_UINT32*/) const
+ 	{
+ 		return substr(true, start, len);
+ 	}
 // 	//////////////////////////////////////////////////////////////////////////
 // 	String&& String::toGBK() const
 // 	{

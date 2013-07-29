@@ -86,6 +86,23 @@ enum class Charset{
 	UTF32 = 0x41	//00040001
 };
 
+//Iterator
+/*
+template<typename Base>
+class CharsetIterator
+{
+	Base::pointer TPtr;
+
+public:
+	CharsetIterator(Base::pointer ptr)
+		: TPtr(ptr)
+	{}
+
+	CharsetIterator<Base>& operator++();
+	Base::valueType operator*();
+};
+*/
+
 //CharsetOperation
 template<Charset set, typename MethodT>
 struct CharsetOperation
@@ -215,10 +232,6 @@ struct UTF16Method
 typedef CharsetOperation<Charset::GBK, GBKMethod> GBK;
 typedef CharsetOperation<Charset::UTF8, UTF8Method> UTF8;
 typedef CharsetOperation<Charset::UTF16, UTF16Method> UTF16;
-
-//CharsetConvert
-template<typename from>
-struct CharsetConvert;
 
 //////////////////////////////////////////////////////////////////////////
 bool IsWideCharset(Charset charSet)

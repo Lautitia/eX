@@ -11,6 +11,51 @@
 
 #include "string.h"
 
+bool stringstub_testcase()
+{
+	//
+	using namespace std;
+
+	cout<<"begin test with nChar"<<endl;
+	ex::StringStub ss("²âÊÔ");
+	if( !(ss == "²âÊÔ") )
+	{
+		cout<<"operator == | constructor failed"<<endl;
+		return false;
+	}
+
+	ss = ss+"456";
+	if( !(ss == "²âÊÔ456") )
+	{
+		cout<<"operator + failed"<<endl;
+		return false;
+	}
+
+	ss += "abc";
+	if( !(ss == "²âÊÔ456abc") )
+	{
+		cout<<"operator += failed"<<endl;
+		return false;
+	}
+
+	{
+		//
+		ex::StringStub outs;
+		outs = ss;
+
+		if( !(outs == "²âÊÔ456abc") )
+		{
+			cout<<"operator = failed"<<endl;
+			return false;
+		}
+	}
+	
+	///
+//	cout<<"begin test with wChar"<<endl;
+
+	return true;
+}
+
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -50,9 +95,27 @@ int _tmain(int argc, _TCHAR* argv[])
 // 		destBuffer = nullptr;
 	}
 
+	/*
 	if( !utest::string::run() ){
 		//
 	}
+	*/
+
+	/*
+	ex::StringStub ss = L"ÎÒÃÇÀ´ÊÔÏÂ";
+
+	wChar* p = (wChar*)ss.ptr();
+
+	std::wstring str = (wchar_t*)p;
+
+	{
+		//
+		ex::StringStub v = "123";
+		v = v+ "456";
+		std::cout<<v.ptr()<<std::endl;
+	}
+	*/
+	assert(stringstub_testcase());
 
 	return 0;
 }

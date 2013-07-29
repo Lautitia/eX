@@ -9,6 +9,144 @@
 #include <assert.h>
 
 namespace ex{
+
+	class StringStub
+	{
+	private:
+		typedef std::vector<char> CharStub;
+		CharStub stub;
+		static const UINT32 stringEndLength = 2;
+
+	public:
+		StringStub()
+		{}
+		StringStub(const nChar* value)
+		{
+			this->operator=(value);
+		}
+		StringStub(const wChar* value)
+		{
+			this->operator=(value);
+		}
+		virtual ~StringStub()
+		{}
+
+	public:
+		UINT32 size() const
+		{
+			if(!stub.size())
+			{
+				return 0;
+			}
+			else
+			{
+				return stub.size() - stringEndLength;
+			}
+		}
+		const nChar* ptr() const
+		{
+			return &stub[0];
+		}
+		const wChar* wptr() const
+		{
+			return (wChar*)&stub[0];
+		}
+
+	public:
+		StringStub& operator +(const StringStub& value)
+		{
+			//
+			CharStub tempBuffer;
+			tempBuffer.resize(size() + value.size() + stringEndLength, 0);
+			memcpy((void*)&tempBuffer[0], (const void*)ptr(), size());
+			memcpy((void*)&tempBuffer[size()], (const void*)value.ptr(), value.size());
+			stub = tempBuffer;
+			return *this;
+		}
+		StringStub& operator +(const nChar* value)
+		{
+			//
+			buildWithCharT(value, true);
+			return *this;
+		}
+		StringStub& operator +(const wChar* value)
+		{
+			//
+			buildWithCharT(value, true);
+			return *this;
+		}
+
+
+		StringStub& operator +=(const StringStub& value)
+		{
+			return this->operator+(value);
+		}
+		StringStub& operator +=(const nChar* value)
+		{
+			return this->operator+(value);
+		}
+		StringStub& operator +=(const wChar* value)
+		{
+			return this->operator+(value);
+		}
+
+		StringStub& operator =(const nChar* value)
+		{
+			//
+			buildWithCharT(value, false);
+			return *this;
+		}
+		StringStub& operator =(const wChar* value)
+		{
+			buildWithCharT(value, false);
+			return *this;
+		}
+
+		/*
+		we can't distinguish the [] return nChar or wChar
+		const nChar& operator [](UINT32 index) const
+		{
+			return stub[index];
+		}
+		*/
+
+		bool operator ==(const nChar* value)
+		{
+			const int ret = memcmp((const void*)&stub[0], (const void*)value, size());
+			return ret == 0;
+			//return strcmp((const char*)&stub[0], value);
+		}
+		bool operator ==(const wChar* value)
+		{
+			const int ret = memcmp((const void*)&stub[0], (const void*)value, size());
+			return ret == 0;
+		}
+
+	protected:
+		template<typename T>
+		void buildWithCharT(const T* value, bool isAppend)
+		{
+			//
+			CharStub tempBuffer;
+			if(isAppend)
+			{
+				tempBuffer = stub;
+				tempBuffer.pop_back(); tempBuffer.pop_back();
+			}
+			for(;*value != 0;value++)
+			{
+				char* v = (char*)value;
+				for(int i=0; i<sizeof(T); i++, v++)
+				{
+					//
+					tempBuffer.push_back( *v );
+				}
+			}
+			tempBuffer.push_back('\0'); tempBuffer.push_back('\0');
+			stub = tempBuffer;
+		}
+	};
+
 	class String;
 	typedef std::vector<String> StringArray;
 	class String
@@ -96,6 +234,13 @@ namespace ex{
 	UINT32 gbk2utf8(const nChar* src, UINT32 srcSize, nChar* dest);
 	UINT32 utf82gbk(const nChar* src, UINT32 srcSize, nChar* dest);
 #endif
+
+	///////////////////////////////////////////////////////////////////
+	//Charset Convert
+	template<Charset from, Charset to>
+	struct CharsetConvert
+	{
+	};
 
 	template<typename T>
 	class StringT
