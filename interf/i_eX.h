@@ -20,9 +20,17 @@ namespace ex{
 	public:
 		StringStub()
 		{}
+		StringStub(const nChar*value, UINT32 size)
+		{
+			buildWithCharT(value, size, false);
+		}
 		StringStub(const nChar* value)
 		{
 			this->operator=(value);
+		}
+		StringStub(const wChar* value, UINT32 size)
+		{
+			buildWithCharT(value, size, false);
 		}
 		StringStub(const wChar* value)
 		{
@@ -66,13 +74,13 @@ namespace ex{
 		StringStub& operator +(const nChar* value)
 		{
 			//
-			buildWithCharT(value, true);
+			buildWithCharT(value, MAX_UINT32, true);
 			return *this;
 		}
 		StringStub& operator +(const wChar* value)
 		{
 			//
-			buildWithCharT(value, true);
+			buildWithCharT(value, MAX_UINT32, true);
 			return *this;
 		}
 
@@ -93,12 +101,12 @@ namespace ex{
 		StringStub& operator =(const nChar* value)
 		{
 			//
-			buildWithCharT(value, false);
+			buildWithCharT(value, MAX_UINT32, false);
 			return *this;
 		}
 		StringStub& operator =(const wChar* value)
 		{
-			buildWithCharT(value, false);
+			buildWithCharT(value, MAX_UINT32, false);
 			return *this;
 		}
 
@@ -124,7 +132,7 @@ namespace ex{
 
 	protected:
 		template<typename T>
-		void buildWithCharT(const T* value, bool isAppend)
+		void buildWithCharT(const T* value, UINT32 size, bool isAppend)
 		{
 			//
 			CharStub tempBuffer;
@@ -133,7 +141,7 @@ namespace ex{
 				tempBuffer = stub;
 				tempBuffer.pop_back(); tempBuffer.pop_back();
 			}
-			for(;*value != 0;value++)
+			for(;*value != 0 && size;value++, size--)
 			{
 				char* v = (char*)value;
 				for(int i=0; i<sizeof(T); i++, v++)
@@ -147,14 +155,15 @@ namespace ex{
 		}
 	};
 
+	/////////////////////////////////////////////////////////////////////////////
+	//
 	class String;
 	typedef std::vector<String> StringArray;
 	class String
 	{
 	private:
 		Charset stringCharset;
-		std::string nString;
-		std::wstring wString;
+		StringStub stub;
 
 	private:
 		String&& substr(bool isForward, UINT32 start, UINT32 len) const;
@@ -162,13 +171,10 @@ namespace ex{
 
 	public:
 		E_API String();
-#ifdef WIN32
-		E_API String(const nChar* str, Charset charset = Charset::GBK, UINT32 size = MAX_UINT32);
-#endif // WIN32
-		
-#ifdef WIN32
-		E_API String(const wChar* str, Charset charset = Charset::UTF16, UINT32 size = MAX_UINT32);
-#endif // WIN32
+		E_API String(const nChar* str, Charset charset = EX_DEFAULT_CHARSET);
+		E_API String(const nChar* str, UINT32 size = MAX_UINT32, Charset charset = EX_DEFAULT_CHARSET);
+		E_API String(const wChar* str, Charset charset = EX_DEFAULT_CHARSET);
+		E_API String(const wChar* str, UINT32 size = MAX_UINT32, Charset charset = EX_DEFAULT_CHARSET);
 		
 		E_API String(const String& str);
 
@@ -179,9 +185,9 @@ namespace ex{
 
 		E_API UINT32 length() const;
 		E_API bool empty() const;
-		E_API Charset charset() const;
-		E_API nChar nstr() const;
-		E_API wChar wstr() const;
+//		E_API Charset charset() const;
+		E_API nChar* ptr() const;
+		E_API wChar* wptr() const;
 
 	public:
 		E_API String&& left(UINT32 len) const;
@@ -202,10 +208,12 @@ namespace ex{
 		E_API INT64 toINT64(BaseSystem base = BaseSystem::DECIMAL) const;
 		E_API UINT64 toUINT64(BaseSystem base = BaseSystem::DECIMAL) const;
 
+		/*
 		E_API void MatchEncode(const String& matchTo);
 		E_API String&& toGBK() const;
 		E_API String&& toUTF8() const;
 		E_API String&& toUTF16() const;
+		*/
 
 		E_API bool replace(
 			String&& from
@@ -237,10 +245,12 @@ namespace ex{
 
 	///////////////////////////////////////////////////////////////////
 	//Charset Convert
+	/*
 	template<Charset from, Charset to>
 	struct CharsetConvert
 	{
 	};
+	*/
 
 	template<typename T>
 	class StringT

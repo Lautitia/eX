@@ -16,45 +16,115 @@ bool stringstub_testcase()
 	//
 	using namespace std;
 
-	cout<<"begin test with nChar"<<endl;
-	ex::StringStub ss("²âÊÔ");
-	if( !(ss == "²âÊÔ") )
 	{
-		cout<<"operator == | constructor failed"<<endl;
-		return false;
-	}
-
-	ss = ss+"456";
-	if( !(ss == "²âÊÔ456") )
-	{
-		cout<<"operator + failed"<<endl;
-		return false;
-	}
-
-	ss += "abc";
-	if( !(ss == "²âÊÔ456abc") )
-	{
-		cout<<"operator += failed"<<endl;
-		return false;
-	}
-
-	{
-		//
-		ex::StringStub outs;
-		outs = ss;
-
-		if( !(outs == "²âÊÔ456abc") )
+		cout<<"begin test with nChar"<<endl;
+		ex::StringStub ss("²âÊÔ123456", 4);
+		if( !(ss == "²âÊÔ") )
 		{
-			cout<<"operator = failed"<<endl;
+			cout<<"operator == | constructor failed"<<endl;
 			return false;
 		}
+
+		ss = ss+"456";
+		if( !(ss == "²âÊÔ456") )
+		{
+			cout<<"operator + failed"<<endl;
+			return false;
+		}
+
+		ss += "abc";
+		if( !(ss == "²âÊÔ456abc") )
+		{
+			cout<<"operator += failed"<<endl;
+			return false;
+		}
+
+		{
+			//
+			ex::StringStub outs;
+			outs = ss;
+
+			if( !(outs == "²âÊÔ456abc") )
+			{
+				cout<<"operator = failed"<<endl;
+				return false;
+			}
+		}
+
+		{
+			//
+			std::string src = "²âÊÔ456abc";
+			const nChar* p = ss.ptr();
+			for(int i=0;i<src.length();i++, p++)
+			{
+				if(*p != src[i])
+				{
+					cout<<"nChar bit compare failed"<<endl;
+					return false;
+				}
+			}
+		}
+
+		cout<<"end test with nChar"<<endl;
 	}
 	
 	///
-//	cout<<"begin test with wChar"<<endl;
+	{
+		cout<<"begin test with wChar"<<endl;
+		ex::StringStub ss(L"²âÊÔ123456", 2);
+		if( !(ss == L"²âÊÔ") )
+		{
+			cout<<"operator == | constructor failed"<<endl;
+			return false;
+		}
+
+		ss = ss+L"456";
+		if( !(ss == L"²âÊÔ456") )
+		{
+			cout<<"operator + failed"<<endl;
+			return false;
+		}
+
+		ss += L"abc";
+		if( !(ss == L"²âÊÔ456abc") )
+		{
+			cout<<"operator += failed"<<endl;
+			return false;
+		}
+
+		{
+			//
+			ex::StringStub outs;
+			outs = ss;
+
+			if( !(outs == L"²âÊÔ456abc") )
+			{
+				cout<<"operator = failed"<<endl;
+				return false;
+			}
+		}
+
+		{
+			//
+			std::wstring src = L"²âÊÔ456abc";
+			const wChar* p = ss.wptr();
+			for(int i=0;i<src.length();i++, p++)
+			{
+				if(*p != src[i])
+				{
+					cout<<"wChar bit compare failed"<<endl;
+					return false;
+				}
+			}
+		}
+
+		cout<<"end test with wChar"<<endl;
+	}
 
 	return true;
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
@@ -101,20 +171,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	*/
 
-	/*
-	ex::StringStub ss = L"ÎÒÃÇÀ´ÊÔÏÂ";
+	
 
-	wChar* p = (wChar*)ss.ptr();
-
-	std::wstring str = (wchar_t*)p;
-
-	{
-		//
-		ex::StringStub v = "123";
-		v = v+ "456";
-		std::cout<<v.ptr()<<std::endl;
-	}
-	*/
 	assert(stringstub_testcase());
 
 	return 0;

@@ -11,74 +11,67 @@ namespace ex{
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//
-// 	String&& String::substr(bool isForward, UINT32 start, UINT32 len) const
-// 	{
-// 		switch (stringCharset)
-// 		{
-// 		case Charset::GBK:
-// 			{
-// 				GBK::SubTuple tuple = GBK::substr(nString.c_str(), isForward, start, len);
-// 				return std::move(
-// 					String(std::get<0>(tuple), stringCharset, std::get<1>(tuple))
-// 					);
-// 			}			
-// 			break;
-// 		case Charset::UTF8:
-// 			{
-// 				UTF8::SubTuple tuple = UTF8::substr(nString.c_str(), isForward, start, len);
-// 				return std::move(
-// 					String(std::get<0>(tuple), stringCharset, std::get<1>(tuple))
-// 					);
-// 			}
-// 			break;
-// 		case Charset::UTF16:
-// 			{
-// 				UTF16::SubTuple tuple = UTF16::substr(wString.c_str(), isForward, start, len);
-// 				return std::move(
-// 					String(std::get<0>(tuple), stringCharset, std::get<1>(tuple))
-// 					);
-// 			}
-// 			break;
-// 		case Charset::UTF32:
-// 			break;
-// 		default:
-// 			break;
-// 		}
-// 		return std::move(String());
-// 	}
-// 	//////////////////////////////////////////////////////////////////////////
-// 	String::String()
-// 		: stringCharset(Charset::GBK)
-// 	{}
-// 	String::String(const nChar* str, Charset charset/* = Charset::GBK*/, UINT32 size /* = MAX_UINT32 */)
-// 	{
-// 		//
-// 		if (size == MAX_UINT32){
-// 			nString = std::string(str);
-// 		}
-// 		else{
-// 			nString = std::string(str, size);
-// 		}
-// 		stringCharset = charset;
-// 	}
-// 	String::String(const wChar* str, Charset charset/* = Charset::UTF16*/, UINT32 size /* = MAX_UINT32 */)
-// 	{
-// 		//
-// 		if (size == MAX_UINT32){
-// 			wString = std::wstring(str);
-// 		}
-// 		else{
-// 			wString = std::wstring(str, size);
-// 		}
-// 		stringCharset = charset;
-// 	}
-// 
-// 	String::String(const String& str)
-// 	{
-// 		stringCharset = str.stringCharset;
-// 		nString = str.nString;
-// 		wString = str.wString;
-// 	}
+	String&& String::substr(bool isForward, UINT32 start, UINT32 len) const
+	{
+		switch (stringCharset)
+		{
+		case Charset::GBK:
+			{
+				GBK::SubTuple tuple = GBK::substr(stub.ptr(), isForward, start, len);
+				return std::move(
+					String(std::get<0>(tuple), std::get<1>(tuple))
+					);
+			}			
+			break;
+		case Charset::UTF8:
+			{
+				UTF8::SubTuple tuple = UTF8::substr(stub.ptr(), isForward, start, len);
+				return std::move(
+					String(std::get<0>(tuple), std::get<1>(tuple))
+					);
+			}
+			break;
+		case Charset::UTF16:
+			{
+				UTF16::SubTuple tuple = UTF16::substr(stub.wptr(), isForward, start, len);
+				return std::move(
+					String(std::get<0>(tuple), std::get<1>(tuple))
+					);
+			}
+			break;
+		case Charset::UTF32:
+			break;
+		default:
+			break;
+		}
+		return std::move(String());
+	}
+	//////////////////////////////////////////////////////////////////////////
+	String::String()
+		: stringCharset(EX_DEFAULT_CHARSET)
+	{}
+	String::String(const nChar* str, Charset charset)
+		: stringCharset(charset)
+		, stub(str)
+	{}
+	String::String(const nChar* str, UINT32 size, Charset charset)
+		: stringCharset(charset)
+		, stub(str, size)
+	{}
+	String::String(const wChar* str, Charset charset)
+		: stringCharset(charset)
+		, stub(str)
+	{}
+	String::String(const wChar* str, UINT32 size, Charset charset)
+		: stringCharset(charset)
+		, stub(str, size)
+	{}
+	 
+ 	String::String(const String& str)
+ 	{
+		stringCharset = str.stringCharset;
+		stub = str.stub;
+ 	}
 // 	String::String(INT64 value, BaseSystem base /* = DECIMAL */)
 // 	{
 // 		char buffer[32] = {0};
@@ -140,18 +133,18 @@ namespace ex{
 // 		return wString.c_str();
 // 	}
 // 	//////////////////////////////////////////////////////////////////////////
- 	String&& String::left(UINT32 len) const
- 	{
- 		return substr(true, 0, len);
- 	}
- 	String&& String::right(UINT32 len) const
- 	{
- 		return substr(false, 0, len);
- 	}
- 	String&& String::mid(UINT32 start, UINT32 len/* = MAX_UINT32*/) const
- 	{
- 		return substr(true, start, len);
- 	}
+	String&& String::left(UINT32 len) const
+	{
+		return substr(true, 0, len);
+	}
+	String&& String::right(UINT32 len) const
+	{
+		return substr(false, 0, len);
+	}
+	String&& String::mid(UINT32 start, UINT32 len/* = MAX_UINT32*/) const
+	{
+		return substr(true, start, len);
+	}
 // 	//////////////////////////////////////////////////////////////////////////
 // 	String&& String::toGBK() const
 // 	{

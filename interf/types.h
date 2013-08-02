@@ -86,6 +86,10 @@ enum class Charset{
 	UTF32 = 0x41	//00040001
 };
 
+#ifdef _MSC_VER
+#define EX_DEFAULT_CHARSET (Charset::GBK)
+#endif
+
 //Iterator
 /*
 template<typename Base>
@@ -232,6 +236,8 @@ struct UTF16Method
 typedef CharsetOperation<Charset::GBK, GBKMethod> GBK;
 typedef CharsetOperation<Charset::UTF8, UTF8Method> UTF8;
 typedef CharsetOperation<Charset::UTF16, UTF16Method> UTF16;
+
+//ex::StringStub CharsetConvert(Charset srcCharset, const T* srcValue, Charset dstCharset);
 
 //////////////////////////////////////////////////////////////////////////
 bool IsWideCharset(Charset charSet)
