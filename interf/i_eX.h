@@ -10,12 +10,12 @@
 
 namespace ex{
 
+	typedef std::vector<char> CharStub;
 	class StringStub
 	{
 	private:
-		typedef std::vector<char> CharStub;
 		CharStub stub;
-		static const UINT32 stringEndLength = 2;
+		static const UINT32 stringEndLength = sizeof(wChar);
 
 	public:
 		StringStub()
@@ -58,6 +58,24 @@ namespace ex{
 		const wChar* wptr() const
 		{
 			return (wChar*)&stub[0];
+		}
+		CharStub::iterator begin()
+		{
+			return stub.begin();
+		}
+		CharStub::iterator end()
+		{
+			return stub.end();
+		}
+
+	public:
+		UINT32 find(const nChar* str)
+		{
+			return 0;
+		}
+		UINT32 find(const wChar* str)
+		{
+			return 0;
 		}
 
 	public:
@@ -139,7 +157,6 @@ namespace ex{
 			if(isAppend)
 			{
 				tempBuffer = stub;
-				tempBuffer.pop_back(); tempBuffer.pop_back();
 			}
 			for(;*value != 0 && size;value++, size--)
 			{
@@ -150,8 +167,15 @@ namespace ex{
 					tempBuffer.push_back( *v );
 				}
 			}
-			tempBuffer.push_back('\0'); tempBuffer.push_back('\0');
+			fillEndOfString();
 			stub = tempBuffer;
+		}
+		void fillEndOfString()
+		{
+			for (int i=0; i<stringEndLength; i++)
+			{
+				stub.push_back('\0');
+			}
 		}
 	};
 
@@ -186,8 +210,8 @@ namespace ex{
 		E_API UINT32 length() const;
 		E_API bool empty() const;
 //		E_API Charset charset() const;
-		E_API nChar* ptr() const;
-		E_API wChar* wptr() const;
+		E_API const nChar* ptr() const;
+		E_API const wChar* wptr() const;
 
 	public:
 		E_API String&& left(UINT32 len) const;
@@ -202,19 +226,12 @@ namespace ex{
 		E_API String&& toLowerCase() const;
 
 	public:
-		E_API INT32 toINT32(BaseSystem base = BaseSystem::DECIMAL) const;
-		E_API UINT32 toUINT32(BaseSystem base = BaseSystem::DECIMAL) const;
+		E_API INT32 toINT32() const;
+		E_API UINT32 toUINT32() const;
 
-		E_API INT64 toINT64(BaseSystem base = BaseSystem::DECIMAL) const;
-		E_API UINT64 toUINT64(BaseSystem base = BaseSystem::DECIMAL) const;
-
-		/*
-		E_API void MatchEncode(const String& matchTo);
-		E_API String&& toGBK() const;
-		E_API String&& toUTF8() const;
-		E_API String&& toUTF16() const;
-		*/
-
+		E_API INT64 toINT64() const;
+		E_API UINT64 toUINT64() const;
+		
 		E_API bool replace(
 			String&& from
 			, String&& to

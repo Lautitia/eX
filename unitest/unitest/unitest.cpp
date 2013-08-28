@@ -5,11 +5,85 @@
 #include "../../eX.h"
 #include <iostream>
 #include <windows.h>
+#include <sstream>
 
 #include <tuple>
 #include <functional>
 
 #include "string.h"
+
+bool upper_lower_testcase()
+{
+	using namespace std;
+
+	{
+		nChar v = ' ';
+		assert( toUpperChar(v) == ' ' );
+		assert( toLowerChar(v) == ' ' );
+	}
+	{
+		nChar vu = 'A';
+		assert( toUpperChar(vu) == 'A' );
+
+		nChar vl = 'a';
+		assert( toLowerChar(vl) == 'a' );
+	}
+	{
+		nChar vua = 'a';
+		assert( toUpperChar(vua) == 'A' );
+		nChar vur = 'g';
+		assert( toUpperChar(vur) == 'G' );
+		nChar vuz = 'z';
+		assert( toUpperChar(vuz) == 'Z' );
+		
+		nChar vla = 'A';
+		assert( toLowerChar(vla) == 'a');
+		nChar vlr = 'H';
+		assert( toLowerChar(vlr) == 'h' );
+		nChar vlz = 'Z';
+		assert( toLowerChar(vlz) == 'z' );
+	}
+	{
+		nChar* v = "นค";
+		assert( toUpperChar(*v)==0 );
+		assert( toLowerChar(*v)==0 );
+	}
+	//
+	{
+		wChar v = L' ';
+		assert( toUpperChar(v) == L' ' );
+		assert( toLowerChar(v) == L' ' );
+	}
+	{
+		wChar vu = L'A';
+		assert( toUpperChar(vu) == L'A' );
+
+		wChar vl = L'a';
+		assert( toLowerChar(vl) == L'a' );
+	}
+	{
+		wChar vua = L'a';
+		assert( toUpperChar(vua) == L'A' );
+		wChar vur = L'g';
+		assert( toUpperChar(vur) == L'G' );
+		wChar vuz = L'z';
+		assert( toUpperChar(vuz) == L'Z' );
+
+		wChar vla = L'A';
+		assert( toLowerChar(vla) == L'a');
+		wChar vlr = L'H';
+		assert( toLowerChar(vlr) == L'h' );
+		wChar vlz = L'Z';
+		assert( toLowerChar(vlz) == L'z' );
+	}
+	{
+		wChar* v = L"นค";
+		assert( toUpperChar(*v)==0 );
+		assert( toLowerChar(*v)==0 );
+	}
+
+	return true;
+}
 
 bool stringstub_testcase()
 {
@@ -170,10 +244,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		//
 	}
 	*/
-
 	
-
 	assert(stringstub_testcase());
+	assert(upper_lower_testcase());
 
 	return 0;
 }

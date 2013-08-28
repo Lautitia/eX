@@ -107,6 +107,56 @@ public:
 };
 */
 
+template<typename T>
+INT32 toLowerChar(const T& value)
+{
+	if ( sizeof(T) == sizeof(nChar) )
+	{
+		if ( value >= 'A' && value <= 'Z' )
+		{
+			return value + 32;
+		}
+	}
+	else if( sizeof(T) == sizeof(wChar) )
+	{
+		if ( value >= L'A' && value <= L'Z' )
+		{
+			return value + 32;
+		}
+	}
+
+	if ( value < 0 || value > 127 )
+	{
+		return 0;
+	}
+	return value;
+}
+
+template<typename T>
+INT32 toUpperChar(T value)
+{
+	if ( sizeof(T) == sizeof(nChar) )
+	{
+		if ( value >= 'a' && value <= 'z' )
+		{
+			return value - 32;
+		}
+	}
+	else if( sizeof(T) == sizeof(wChar) )
+	{
+		if ( value >= L'a' && value <= L'z' )
+		{
+			return value - 32;
+		}
+	}
+
+	if ( value < 0 || value > 127 )
+	{
+		return 0;
+	}
+	return value;
+}
+
 //CharsetOperation
 template<Charset set, typename MethodT>
 struct CharsetOperation
@@ -163,6 +213,63 @@ struct CharsetOperation
 		}
 		return SubTuple(strPos, size);
 	}
+	static INT64 toINT64(const Type* str, BaseSystem base)
+	{
+		if (str == nullptr)
+		{
+			return 0;
+		}
+
+		bool negativeFlag = false;
+		if (*str =='-' || *str == L'-')
+		{
+			negativeFlag = true;
+		}
+		else if (*str == '+' || *str == L'+')
+		{
+			negativeFlag = false;
+		}
+		MethodT::move(&str);
+
+		INT64 value = 0;
+		do 
+		{
+			INT32 v = toLowerChar(*str);
+			if ( !v || (v<='0' || v>='9') )
+			{
+				break;
+			}
+			v -= '0';
+			value = value*(int)base + v;
+		} while (MethodT::move(&str));
+		
+		if (negativeFlag)
+		{
+			return -value;
+		}
+		return value;
+	}
+	static INT64 toUINT64(const Type* str, BaseSystem base)
+	{
+		if (str == nullptr)
+		{
+			return 0;
+		}
+
+		UINT64 value = 0;
+		do 
+		{
+			UINT32 v = toLowerChar(*str);
+			if ( !v || (v<='0' || v>='9') )
+			{
+				break;
+			}
+			v -= '0';
+			value = value*(int)base + v;
+		} while (MethodT::move(&str));
+
+		return value;
+	}
 };
 
 //GBK
@@ -185,6 +292,18 @@ struct GBKMethod
 		}
 		(*pos) += size;
 		return size;
+	}
+	static INT64 toINT64(const Type* str, BaseSystem base)
+	{
+		//
+		if (str == nullptr)
+		{
+			return 0;
+		}
+		do 
+		{
+			//
+		} while (move(&str));
 	}
 };
 
@@ -215,7 +334,7 @@ struct UTF8Method
 		UINT32 bytes = utf8bytes(**pos);
 		(*pos) += bytes;
 		return bytes;
-	} 
+	}
 };
 
 //UTF16
